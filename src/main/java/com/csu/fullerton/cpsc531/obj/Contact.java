@@ -8,6 +8,8 @@ package com.csu.fullerton.cpsc531.obj;
 import java.sql.Blob;
 import java.util.UUID;
 
+import javax.swing.JFormattedTextField;
+
 /**
  *
  * @author Liam
@@ -25,7 +27,7 @@ public class Contact {
     private String cellphone = "";
     private String role = ""; //employee, manager, customer
     private Blob photo = null;
-    private UUID report_to;
+    private String report_to;
     private String department_code = "";
 
     public Contact() {
@@ -131,11 +133,11 @@ public class Contact {
         this.photo = photo;
     }
 
-    public UUID getReport_to() {
+    public String getReport_to() {
         return report_to;
     }
 
-    public void setReport_to(UUID report_to) {
+    public void setReport_to(String report_to) {
         this.report_to = report_to;
     }
 
