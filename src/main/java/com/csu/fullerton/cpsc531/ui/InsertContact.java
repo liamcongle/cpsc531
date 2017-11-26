@@ -5,13 +5,26 @@
  */
 package com.csu.fullerton.cpsc531.ui;
 
+import com.csu.fullerton.cpsc531.obj.Contact;
+import com.csu.fullerton.cpsc531.obj.main;
+import com.csu.fullerton.cpsc531.database.Cassandra;
+
 import com.csu.fullerton.cpsc531.ui.utils.ImageFilter;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.util.UUID;
+
 import javax.imageio.ImageIO;
+import javax.sql.rowset.serial.SerialException;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 
 /**
  *
@@ -22,8 +35,13 @@ public class InsertContact extends javax.swing.JFrame {
     /**
      * Creates new form InsertContact
      */
+	Contact insContact = new Contact();
+	Cassandra cassandra = new Cassandra();
+	
+	
     public InsertContact() {
-        initComponents();
+    	
+    	initComponents();
     }
 
     /**
@@ -36,7 +54,7 @@ public class InsertContact extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel8 = new javax.swing.JLabel();
-        txt_firstname = new javax.swing.JFormattedTextField();
+        txt_firstname = new javax.swing.JFormattedTextField();        
         jLabel9 = new javax.swing.JLabel();
         txt_lastname = new javax.swing.JFormattedTextField();
         jLabel10 = new javax.swing.JLabel();
@@ -205,7 +223,8 @@ public class InsertContact extends javax.swing.JFrame {
 
         combo_department.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
         combo_department.setForeground(new java.awt.Color(0, 153, 51));
-
+        combo_department.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Planning", "Development", "Testing", "Integration", "Management" }));
+        
         jLabel17.setFont(new java.awt.Font("Century Gothic", 0, 14)); // NOI18N
         jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel17.setText("Reports to:");
@@ -213,7 +232,7 @@ public class InsertContact extends javax.swing.JFrame {
         combo_report_to.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
         combo_report_to.setForeground(new java.awt.Color(0, 153, 51));
         combo_report_to.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
+        
         combo_role.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
         combo_role.setForeground(new java.awt.Color(0, 153, 51));
         combo_role.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Employee", "Manager", "Supervisor", "CEO", "CFO", "Other" }));
@@ -347,14 +366,59 @@ public class InsertContact extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void _btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event__btn_resetActionPerformed
+//    private static void setFirstname(JFormattedTextField txt_firstname2) {
+		// TODO Auto-generated method stub
+		
+//	}
+
+	private void _btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event__btn_resetActionPerformed
 
     }//GEN-LAST:event__btn_resetActionPerformed
 
     private void _btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event__btn_addActionPerformed
-        // TODO add your handling code here:
+    	
+    	UUID contactId = UUID.randomUUID();
+    	insContact.setContactId(contactId);
+    	
+    	String firstname = txt_firstname.getText();
+    	insContact.setFirstname(firstname);
+        
+        String lastname = txt_lastname.getText();
+        insContact.setLastname(lastname);
+        
+        String company = txt_company.getText();
+        insContact.setCompany(company);
+        
+        String address1 = txt_address1.getText();
+        insContact.setAddress1(address1);
+        
+        String address2 = txt_address2.getText();
+        insContact.setAddress2(address2);
+        
+        String email = txt_email.getText();
+        insContact.setEmail(email);
+        
+        String telephone = txt_telephone.getText();
+        insContact.setTelephone(telephone);
+        
+        String cellphone = txt_cellphone.getText();
+        insContact.setCellphone(cellphone);
+        
+        String department_code = (String)combo_department.getSelectedItem();
+        insContact.setDepartment_code(department_code); 
+        
+        String report_to = (String)combo_report_to.getSelectedItem();
+        insContact.setReport_to(report_to);
+        
+        String role = (String)combo_role.getSelectedItem();
+        insContact.setRole(role);
+    
+    	cassandra.insertContact(insContact);
+  
     }//GEN-LAST:event__btn_addActionPerformed
-
+    
+      
+    
     private void _btn_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event__btn_cancelActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event__btn_cancelActionPerformed
@@ -367,15 +431,17 @@ public class InsertContact extends javax.swing.JFrame {
         int result = fc.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
-            try {
-                ImageIcon icon = new ImageIcon(ImageIO.read(file));
+                ImageIcon icon = null;
+				try {
+					icon = new ImageIcon(ImageIO.read(file));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 Image img = icon.getImage();
                 Image newimg = img.getScaledInstance(165, 165, java.awt.Image.SCALE_SMOOTH);
                 _btn_photo.setText("");
-                _btn_photo.setIcon(new ImageIcon(newimg));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                _btn_photo.setIcon(new ImageIcon(newimg));         
         }
     }//GEN-LAST:event__btn_photoActionPerformed
 
